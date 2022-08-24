@@ -1,10 +1,18 @@
 <template>
   <div class="login_form">
-    <h1><slot name="title"></slot></h1>
+    <h1>
+      <slot name="title"></slot>
+    </h1>
     <form @submit.prevent>
-      <my-input class="input__login" placeholder="Username" v-model="userLog.username"/>
-      <my-input class="input__login" placeholder="Password" v-model="userLog.password" type="password"/>
-      <my-button class="btn__login" @click="submitForm"><slot name="btn_form"></slot></my-button>
+      <my-input class="input__login" placeholder="Username" v-model="v$.userLog.username.$model"/>
+      <p class="helper_text" v-if="!v$.userLog.username.$error">Username</p>
+      <p class="error_message" v-for="error in v$.userLog.username.$errors">{{ error.$message }}</p>
+      <my-input class="input__login" placeholder="Password" v-model="v$.userLog.password.$model" type="password"/>
+      <p class="helper_text" v-if="!v$.userLog.password.$error">Password</p>
+      <p class="error_message" v-for="error in v$.userLog.password.$errors">{{ error.$message }}</p>
+      <my-button class="btn__login" @click="submitForm">
+        <slot name="btn_form"></slot>
+      </my-button>
       <slot name="title__choice"></slot>
     </form>
   </div>
@@ -13,10 +21,15 @@
 <script>
 import MyInput from "@/components/MyInput";
 import MyButton from "@/components/MyButton";
+import useVuelidate from '@vuelidate/core'
+import {minLength, required} from '@vuelidate/validators'
 
 export default {
   name: "UserAuthForm",
   components: {MyButton, MyInput},
+  setup() {
+    return {v$: useVuelidate()}
+  },
   data() {
     return {
       userLog: {
@@ -27,7 +40,19 @@ export default {
   },
   methods: {
     submitForm() {
+      if (this.v$.$invalid) {
+        alert("вы даун")
+        return
+      }
       this.$emit("submitForm", this.userLog);
+    }
+  },
+  validations() {
+    return {
+      userLog: {
+        username: {required, minLength: minLength(6)},
+        password: {required, minLength: minLength(10)},
+      }
     }
   }
 }
@@ -57,7 +82,18 @@ h1 {
 }
 
 .btn__login {
+  margin-top: 10px;
   font-size: 20px;
+}
+
+.helper_text {
+  margin: 0 18px 5px;
+  color: grey;
+}
+
+.error_message {
+  margin: 0 18px 5px;
+  color: #ff3232;
 }
 
 </style>
