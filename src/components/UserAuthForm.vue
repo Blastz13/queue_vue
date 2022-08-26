@@ -4,11 +4,11 @@
       <slot name="title"></slot>
     </h1>
     <form @submit.prevent>
-      <my-input class="input__login" placeholder="Username" v-model="v$.userLog.username.$model"/>
-      <p class="helper_text" v-if="!v$.userLog.username.$error">Username</p>
+      <my-input class="input__login" :class="{'error':usernameValidationError}" placeholder="Username" v-model="v$.userLog.username.$model"/>
+      <p class="error_message" v-if="!v$.userLog.username.$error"></p>
       <p class="error_message" v-for="error in v$.userLog.username.$errors">{{ error.$message }}</p>
-      <my-input class="input__login" placeholder="Password" v-model="v$.userLog.password.$model" type="password"/>
-      <p class="helper_text" v-if="!v$.userLog.password.$error">Password</p>
+      <my-input class="input__login" :class="{'error':passwordValidationError}" placeholder="Password" v-model="v$.userLog.password.$model" type="password"/>
+      <p class="error_message" v-if="!v$.userLog.password.$error"></p>
       <p class="error_message" v-for="error in v$.userLog.password.$errors">{{ error.$message }}</p>
       <my-button class="btn__login" @click="submitForm">
         <slot name="btn_form"></slot>
@@ -35,13 +35,21 @@ export default {
       userLog: {
         username: "",
         password: ""
-      }
+      },
+      passwordValidationError:false,
+      usernameValidationError:false,
     }
   },
   methods: {
     submitForm() {
       if (this.v$.$invalid) {
-        alert("вы даун")
+        this.v$.$touch()
+        if (this.v$.userLog.username.$errors){
+          this.usernameValidationError = true
+        }
+        if (this.v$.userLog.password.$errors){
+          this.passwordValidationError = true
+        }
         return
       }
       this.$emit("submitForm", this.userLog);
@@ -76,6 +84,7 @@ h1 {
 
 .input__login {
   margin-top: 10px;
+  margin-bottom: 5px;
   height: 60px;
   background-color: #f8f8f8;
   border: 2px solid #ccc !important;
@@ -86,14 +95,13 @@ h1 {
   font-size: 20px;
 }
 
-.helper_text {
-  margin: 0 18px 5px;
-  color: grey;
-}
-
 .error_message {
-  margin: 0 18px 5px;
-  color: #ff3232;
+  height: 10px;
+  margin-left: 18px;
+  color: red;
 }
-
+.error{
+  border: 2px solid red !important;
+  background-color: #fff0f0;
+}
 </style>
