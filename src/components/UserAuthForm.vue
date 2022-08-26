@@ -4,10 +4,10 @@
       <slot name="title"></slot>
     </h1>
     <form @submit.prevent>
-      <my-input class="input__login" :class="{'error':usernameValidationError}" placeholder="Username" v-model="v$.userLog.username.$model"/>
+      <my-input :class="['input__login', {'error':usernameValidationError}]" placeholder="Username" v-model="v$.userLog.username.$model"/>
       <p class="error_message" v-if="!v$.userLog.username.$error"></p>
       <p class="error_message" v-for="error in v$.userLog.username.$errors">{{ error.$message }}</p>
-      <my-input class="input__login" :class="{'error':passwordValidationError}" placeholder="Password" v-model="v$.userLog.password.$model" type="password"/>
+      <my-input :class="['input__login', {'error':passwordValidationError}]" placeholder="Password" v-model="v$.userLog.password.$model" type="password"/>
       <p class="error_message" v-if="!v$.userLog.password.$error"></p>
       <p class="error_message" v-for="error in v$.userLog.password.$errors">{{ error.$message }}</p>
       <my-button class="btn__login" @click="submitForm">
@@ -36,22 +36,18 @@ export default {
         username: "",
         password: ""
       },
-      passwordValidationError:false,
-      usernameValidationError:false,
+      passwordValidationError: false,
+      usernameValidationError: false
     }
   },
   methods: {
     submitForm() {
       if (this.v$.$invalid) {
-        this.v$.$touch()
-        if (this.v$.userLog.username.$errors){
-          this.usernameValidationError = true
-        }
-        if (this.v$.userLog.password.$errors){
-          this.passwordValidationError = true
-        }
+        this.usernameValidationError = this.v$.userLog.username.$error;
+        this.passwordValidationError = this.v$.userLog.password.$error;
         return
       }
+
       this.$emit("submitForm", this.userLog);
     }
   },
