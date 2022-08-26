@@ -4,13 +4,35 @@
       <slot name="title"></slot>
     </h1>
     <form @submit.prevent>
-      <my-input :class="['input__login', {'error':usernameValidationError}]" placeholder="Username" v-model="v$.userLog.username.$model"/>
-      <p class="error_message" v-if="!v$.userLog.username.$error"></p>
-      <p class="error_message" v-for="error in v$.userLog.username.$errors">{{ error.$message }}</p>
-      <my-input :class="['input__login', {'error':passwordValidationError}]" placeholder="Password" v-model="v$.userLog.password.$model" type="password"/>
-      <p class="error_message" v-if="!v$.userLog.password.$error"></p>
-      <p class="error_message" v-for="error in v$.userLog.password.$errors">{{ error.$message }}</p>
-      <my-button class="btn__login" @click="submitForm">
+      <my-input
+          :class="['input__login', {'error_input':v$.userLog.username.$error}]"
+          placeholder="Username"
+          v-model="v$.userLog.username.$model"/>
+      <p
+          class="error_message"
+          v-if="!v$.userLog.username.$error"></p>
+      <p
+          class="error_message"
+          v-for="error in v$.userLog.username.$errors">
+        {{ error.$message }}
+      </p>
+      <my-input
+          :class="['input__login', {'error_input':v$.userLog.password.$error}]"
+          placeholder="Password"
+          v-model="v$.userLog.password.$model"
+          type="password"/>
+      <p
+          class="error_message"
+          v-if="!v$.userLog.password.$error">
+      </p>
+      <p
+          class="error_message"
+          v-for="error in v$.userLog.password.$errors">
+        {{ error.$message }}
+      </p>
+      <my-button
+          class="btn__login"
+          @click="submitForm">
         <slot name="btn_form"></slot>
       </my-button>
       <slot name="title__choice"></slot>
@@ -35,20 +57,16 @@ export default {
       userLog: {
         username: "",
         password: ""
-      },
-      passwordValidationError: false,
-      usernameValidationError: false
+      }
     }
   },
   methods: {
     submitForm() {
-      if (this.v$.$invalid) {
-        this.usernameValidationError = this.v$.userLog.username.$error;
-        this.passwordValidationError = this.v$.userLog.password.$error;
+      if (this.v$.$validate()) {
+        this.$emit("submitForm", this.userLog);
+      } else {
         return
       }
-
-      this.$emit("submitForm", this.userLog);
     }
   },
   validations() {
@@ -96,7 +114,8 @@ h1 {
   margin-left: 18px;
   color: red;
 }
-.error{
+
+.error_input {
   border: 2px solid red !important;
   background-color: #fff0f0;
 }
